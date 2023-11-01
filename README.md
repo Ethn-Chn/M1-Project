@@ -11,3 +11,17 @@ Les données proviennent d'un protocole d'échantillonnage mis en place par le D
 - `/R`: Scripts et notebooks R originels.
 - `/Python`: Scripts Python transcrits.
 - `/Data`: Jeu de données.
+
+# M1 Project: Statistical Analysis of Crab Pricing (1973 - 1982)
+
+This project was carried out as part of my university curriculum at Sorbonne University. Its objective is to analyze the environmental factors that may explain the fluctuations in crab pricing between 1973 and 1982.
+
+## Background
+
+The data comes from a sampling protocol established by the Alaska Department of Fish and Game. The project was initially coded in R (with R Markdown and RStudio) and was subsequently transcribed into Python, with slight improvements and therefore outputs that may be slightly different between the two versions. The overall integrity of the project remains unchanged.
+
+## Repository Structure
+
+- `/R`: Original R scripts and notebooks.
+- `/Python`: Transcribed Python scripts.
+- `/Data`: Dataset.
