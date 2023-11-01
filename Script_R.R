@@ -1,6 +1,3 @@
-library(knitr)
-library(rmarkdown)
-library(markdown)
 library(FactoMineR)
 library(factoextra)
 library(ggplot2)
