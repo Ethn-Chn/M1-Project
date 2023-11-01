@@ -4,7 +4,7 @@ Ce projet a été réalisé en groupe de 2 dans le cadre de ma formation univers
 
 ## Contexte
 
-Les données proviennent d'un protocole d'échantillonnage mis en place par le Département d’Alaska des Pêches et de la Faune (The Alaska Department of Fish and Game). Le projet a été initialement codé en R (avec R Markdown et RStudio) et a par la suite été transcrit par moi-même en Python, avec de légères améliorations et donc des sorties pouvant être légèrement différentes entre les deux versions. La globalité du projet reste identique.
+Les données proviennent d'un protocole d'échantillonnage mis en place par le Département d’Alaska des Pêches et de la Faune (The Alaska Department of Fish and Game). Le projet a été initialement codé en R (avec R Markdown et RStudio) et a par la suite été transcrit par moi-même en Python comme entrainement, avec de légères améliorations et donc des sorties pouvant être légèrement différentes entre les deux versions. La globalité du projet reste identique.
 
 ## Structure du Répertoire
 
@@ -18,7 +18,7 @@ This project was carried out as part of my university curriculum at Sorbonne Uni
 
 ## Background
 
-The data comes from a sampling protocol established by the Alaska Department of Fish and Game. The project was initially coded in R (with R Markdown and RStudio) and was subsequently transcribed into Python by myself, with slight improvements and therefore outputs that may be slightly different between the two versions. The overall project remains unchanged.
+The data comes from a sampling protocol established by the Alaska Department of Fish and Game. The project was initially coded in R (with R Markdown and RStudio) and was subsequently transcribed into Python by myself for training, with slight improvements and therefore outputs that may be slightly different between the two versions. The overall project remains unchanged.
 
 ## Repository Structure
 
