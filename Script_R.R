@@ -8,24 +8,23 @@ library(nlme)
 library(AER)
 library(reshape2)
 
-#### Manipulation des données ####
-###--kodiak = Coordonnées géographiques
+#### Data manipulation ####
+###--kodiak = Geo coordinates
 kodiak <- read.table("./data/kodiak.txt")
 colnames(kodiak) <- c("Latitude","Longitude")
 
-###--dstns = frequence des crabes par categories de taille :
+###--dstns = brabs frequency by size  :
 dstns <- read.table("./data/dstns.txt")
 colnames(dstns) <- c("Year","Lenght","Females_juvenils","Females_Adult","Males")
 
-####---fleet : pêche commerciale :
+####---fleet : data about fisheries :
 fleet <- read.table("./data/fleet.txt")
 colnames(fleet) <- c("Year","Vessels_register_fishing","Crab_catch","Weight_crab_catch","pot_lifts","Price_crab")
 fleet$Year=as.factor(fleet$Year)
 fleet$Meankg=fleet$Weight_crab_catch/fleet$Crab_catch
 fleet$logprice=log(fleet$Price_crab)
 
-###----fullness : Pour chaque annee de l'enquête, une distribution de frequence de toutes les femelles
-#classifie par taille (par increments de 1 mm) et pourcentage de plenitude de l'embrayage (5            #categories). La plenitude de l'embrayage est, en gros, le potentiel de ponte realise d'un crabe femelle.
+###----fullness : Female frequency and egg laying potential
 fullness <- read.table("./data/fullness.txt")
 colnames(fullness) <- c("Year","Size","0%_fullness","1-29%_fullnes","30-59%_fullness","60-89%_fullness","90-100%_fullness")
 
@@ -35,14 +34,14 @@ colnames(survey) = c("annee","district","station","pots","latitude","longitude",
 survey$price <- fleet$Price_crab[match(survey$annee,fleet$Year)] 
 survey$legal_male <- survey$rmale+survey$prmale 
 
-#creation d'une variable : all_male = tous les mâles 
+# New variable : all_male 
 survey$all_male <- (survey$pre4+survey$pre3+survey$pre2+survey$pre1+survey$rmale+survey$prmale)
 survey$all.female <- survey$juvfemale+survey$adultfemale
 
-#calcul du sex ratio :
+#calculation du sex ratio :
 survey$sexratio <- survey$all.female/survey$all_male
 
-# Remplacement des 0 par des Nan 
+# 0 --> Nan
 survey$sexratio <- replace(survey$sexratio,survey$sexratio==0,NA)
 survey$sexratio <- replace(survey$sexratio,survey$sexratio=="NaN",NA)
 survey$sexratio <- replace(survey$sexratio,survey$sexratio=="Inf",NA)
@@ -71,7 +70,7 @@ catch$vessels <- fleet$Vessels_register_fishing[match(catch$annee,fleet$Year)]
 #ajout du nombre de piège à crabe :
 catch$pieges <- fleet$pot_lifts[match(catch$annee,fleet$Year)]
 
-# Prix
+# Price
 catch$Pricekg=(catch$Price/0.45)
 catch$PoidsCrabs=catch$Nbcapturekg/catch$Nbcapture
 catch$Meanprice1crab=catch$PoidsCrabs*catch$Pricekg
@@ -84,8 +83,8 @@ eggs$salinity <- meansalinity$salinity[match(eggs$annee,meansalinity$annee)]
 salinite$annee=as.factor(salinite$annee)
 salinite$mois=as.factor(salinite$mois)
 
-#### Statistiques descriptives ####
-# Augmentation du prix au cours du temps
+#### descriptive statistics  ####
+# Increase in price over time
 fleet$Year=as.numeric(fleet$Year)
 ggplot(fleet, aes(x = fleet$Year, y= fleet$Price))+
   geom_point(color="darkred", size =3)+
@@ -93,27 +92,27 @@ ggplot(fleet, aes(x = fleet$Year, y= fleet$Price))+
   geom_smooth(model=exp)
 fleet$Year=as.factor(fleet$Year)
 
-##Nombre de capture en fonction du temps :
+## Number of captures over time::
 ggplot(catch, aes(annee, Nbcapture)) +
   geom_boxplot()+
   labs( x = "Annees", y = "Nombre de crabes capturés", size=5) 
-###Nombre de bateaux de pêche :
+### Number of fishing boats::
 ggplot(fleet, aes(x=fleet$Year, y=fleet$Vessels_register_fishing))+
   geom_point()+ 
   labs( x = "Années", y = "Nombre de bateau de pêche enregisté", size=5) 
-### Nombre de piège :
+### Number of traps: :
 ggplot(fleet, aes(x=fleet$Year, y=fleet$pot_lifts))+
   geom_point(size=1)+ 
   labs( x = "Années", y = "Nombre de piège à crabe enregisté", size=5) 
-### Poids total des captures :
+### Total weight of catches::
 ggplot(fleet, aes(x=fleet$Year, y=fleet$Weight_crab_catch))+
   geom_point(size=1.5)+ 
   labs( x = "Années", y = "Poids total de crabe pêché (en kilogramme)", size=5)
-### Poids moyen des crabes :
+### Average weight of crabs: :
 ggplot(catch, aes(annee, PoidsCrabs))+  
   geom_boxplot()+
   labs( x = "Annees", y = "Poids en livre", size=5) 
-### Fullness femelles 100 %
+### Fullness females 100 %
 fullness_years <- aggregate(fullness[, 7], list(fullness$Year), sum)   
 colnames(fullness_years) <- c("Year",
                               "Female_100%")
@@ -121,7 +120,7 @@ ggplot(data=fullness_years,aes(y=fullness_years$`Female_100%`, x=as.factor(fulln
   geom_point()+
   labs(x = "Années", y = "Nombre de femelle", size=5)
 
-#### Analyses en composantes principales (ACP) ####
+#### Principal Component Analysis (PCA) ####
 fleet_stand <- scale(fleet[,2:8])
 acp.res2 <- PCA(fleet_stand)
 var2 <- get_pca_var(acp.res2)
@@ -137,11 +136,11 @@ survey_acp <- cbind.data.frame(survey$latitude,survey$longitude,
                                survey$legal_male,survey$all_male,survey$all.female,survey$sexratio) 
 colnames(survey_acp) <- c("latitude","longitude",'legal_mal',"all.male","all.female",
                           "sexratio")
-# Standardisation des données pour l'acp 
+# Standardization of data for PCA
 survey_stand <- scale(survey_acp)
 
 acp.res1 <- PCA(survey_stand) 
-# Plusieurs NA, pour l'acp R les renplace par la valeur moyenne de la variable. 
+# missing values in PCA: Replacing NA values with the variable's mean in R. 
 var1 <- get_pca_var(acp.res1)
 fviz_eig(acp.res1, addlabels = TRUE, ylim = c(0, 50))
 fviz_cos2(acp.res1, choice = "var", axes = 1:4)
@@ -149,7 +148,7 @@ acp.res1$eig
 plot(acp.res1, choix = "var", axes = c(1,2))
 corrplot(var1$contrib, is.corr=FALSE) 
 
-# coloration de la représentation en fonction du cos²:
+# Coloring the representation based on cos²:
 fviz_pca_var(acp.res1, col.var = "cos2", axes = c(1,2), 
              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
              repel = TRUE)  # Évite le chevauchement de texte) 
@@ -160,41 +159,41 @@ fviz_pca_var(acp.res1, col.var = "cos2", axes = c(1,3),
 plot(catch$Meanprice1crab~catch$annee)
 hist(catch$Meanprice1crab)
 
-#### Modèles ####
-### Prix moyen d'un crabe en fonction du temps
+#### Models ####
+### Average price of a crab over time
 mod_prix1crab1=glm(catch$Meanprice1crab~catch$annee,family = poisson)
 plot(mod_prix1crab1)
 dispersiontest(mod_prix1crab1)
 summary(mod_prix1crab1)
 S=summary(mod_prix1crab1)$coefficients
 
-# Modèle simple : 
+# Simple model:
 plot(fleet$Price_crab~fleet$Vessels_register_fishing)
 modprix=lm(fleet$Price_crab~fleet$Vessels_register_fishing)
 plot(modprix)
-# Hétérogeneité des variances
+# Variance heterogeneity
 
 fleet$logprice=log(fleet$Price_crab)
 plot(fleet$logprice~fleet$Vessels_register_fishing+fleet$Meankg)
 
-# Toute les variables explicatives
+# Explanatory variables
 modprixlog=lm(fleet$logprice~fleet$Vessels_register_fishing+fleet$Crab_catch+fleet$Meankg) 
-#### Modele utilisé dans le rapport
+#### Model used in the report
 plot(modprixlog)
-modprixlog0=lm(fleet$logprice~1) # Modèle null
+modprixlog0=lm(fleet$logprice~1) # Model null
 step(modprixlog,scope=~fleet$Vessels_register_fishing+fleet$Crab_catch+fleet$Meankg,direction="both")
 summary(modprixlog)
 S2=(summary(modprixlog))$coefficients
 summary(modprixlog)
 
-### Poids moyen :
+ 
 plot(catch$PoidsCrabs~catch$annee)
 modpoids=lm(catch$PoidsCrabs~catch$annee)
 plot(modpoids)
 summary(modpoids)
 S3=summary(modpoids)$coefficients
 
-### Abondance en males capturables
+### Abundance of catchable males
 survey$legal_male <- survey$rmale+survey$prmale 
 plot(survey$legal_male~survey$annee)
 
@@ -227,7 +226,7 @@ mod_legalmale0=glm(survey$legal_male~1,family = quasipoisson)
 mod_legalmale1=glm(survey$legal_male~survey$annee+survey$district+survey$pots,family = quasipoisson)
 survey$annee=relevel(survey$annee, ref = 2) # Changement de reference
 
-# Modele utilisé dans le rapport
+# Model used in the report
 mod_legalmale=glm(survey$legal_male~survey$annee*survey$district+survey$pots,family = quasipoisson)
 plot(mod_legalmale)
 summary(mod_legalmale)
@@ -237,7 +236,7 @@ S4=summary(mod_legalmale)$coefficients
 pr2=(mod_legalmale$null.deviance-mod_legalmale$deviance)/mod_legalmale$null.deviance
 survey$annee=relevel(survey$annee, ref = 2)# Retour ref de base
 
-### Fertilité des femelles
+### Female fertility
 meanlegal=aggregate(survey[,16],list(survey$annee),sum)
 meansalinity <- aggregate(salinite[,3], list(salinite$annee), mean)
 meanfull=aggregate(fullness[,7],list(fullness$Year),sum)
